@@ -27,19 +27,19 @@ class JSONServer(HandleRequests):
     #     except AttributeError:
     #         return self.response("No view for that route", status.HTTP_404_CLIENT_ERROR_RESOURCE_NOT_FOUND.value)
 
-    # def do_POST(self):
-    #     # Parse the URL
-    #     url = self.parse_url(self.path)
-    #     # Determine the correct view needed to handle the requests
-    #     view = self.determine_view(url)
-    #     # Get the request body
-    #     request_body = self.get_request_body()
-    #     # Invoke the correct method on the view
-    #     try:
-    #         view.create(self, request_body)
-    #     # Make sure you handle the AttributeError in case the client requested a route that you don't support
-    #     except AttributeError:
-    #         return self.response("No view for that route", status.HTTP_404_CLIENT_ERROR_RESOURCE_NOT_FOUND.value)
+    def do_POST(self):
+        # Parse the URL
+        url = self.parse_url(self.path)
+        # Determine the correct view needed to handle the requests
+        view = self.determine_view(url)
+        # Get the request body
+        request_body = self.get_request_body()
+        # Invoke the correct method on the view
+        try:
+            view.create(self, request_body)
+        # Make sure you handle the AttributeError in case the client requested a route that you don't support
+        except AttributeError:
+            return self.response("No view for that route", status.HTTP_404_CLIENT_ERROR_RESOURCE_NOT_FOUND.value)
 
     # def do_DELETE(self):
     #     url = self.parse_url(self.path)

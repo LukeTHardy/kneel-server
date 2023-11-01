@@ -1,10 +1,32 @@
 import json
+import time
 from nss_handler import status
-from repository import db_get_single, db_get_all
-# , db_delete, db_update, db_create
+from repository import db_get_single, db_get_all, db_create
+# , db_delete, db_update, 
 
 class OrdersView():
     
+    def create(self, handler, request_body_data):
+        current_timestamp = int(time.time())
+        sql = """
+        INSERT INTO ORDERS (timestamp, metalId, sizeId, styleId)
+        VALUES (?, ?, ?, ?)
+        """
+        db_new_id = db_create(
+            sql, (current_timestamp, request_body_data['metalId'], request_body_data['sizeId'], request_body_data['styleId']))
+
+        if db_new_id:
+            response_data = {
+                "id": db_new_id,
+                "timestamp": current_timestamp,
+                "metalId": request_body_data['metalId'],
+                "sizeId": request_body_data['sizeId'],
+                "styleId": request_body_data['styleId']
+            }
+            return handler.response(json.dumps(response_data), status.HTTP_201_SUCCESS_CREATED.value)
+        else:
+            return handler.response("Failed to create order", status.HTTP_404_CLIENT_ERROR_RESOURCE_NOT_FOUND.value)
+        
     def get(self, handler, pk):
         url = handler.parse_url(handler.path)
 
@@ -20,13 +42,14 @@ class OrdersView():
         query_results = db_get_single(sql, pk)
         order = dict(query_results)
 
-        for resource in expanded_resources:
-            if resource == 'metal':
-                self.get_expanded_metal_info(order)
-            if resource == 'size':
-                self.get_expanded_size_info(order)
-            if resource == 'style':
-                self.get_expanded_style_info(order)
+        if expanded_resources:
+            for resource in expanded_resources:
+                if resource == 'metal':
+                    self.get_expanded_metal_info(order)
+                if resource == 'size':
+                    self.get_expanded_size_info(order)
+                if resource == 'style':
+                    self.get_expanded_style_info(order)
 
         return order
         
@@ -35,16 +58,17 @@ class OrdersView():
         query_results = db_get_all(sql)
         orders = [dict(row) for row in query_results]
 
-        for resource in expanded_resources:
-            if resource == 'metal':
-                for order in orders:
-                    self.get_expanded_metal_info(order)
-            if resource == 'size':
-                for order in orders:
-                    self.get_expanded_size_info(order)
-            if resource == 'style':
-                for order in orders:
-                    self.get_expanded_style_info(order)
+        if expanded_resources:
+            for resource in expanded_resources:
+                if resource == 'metal':
+                    for order in orders:
+                        self.get_expanded_metal_info(order)
+                if resource == 'size':
+                    for order in orders:
+                        self.get_expanded_size_info(order)
+                if resource == 'style':
+                    for order in orders:
+                        self.get_expanded_style_info(order)
 
         return orders    
 
