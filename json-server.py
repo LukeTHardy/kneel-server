@@ -1,9 +1,8 @@
+# Add your imports below this line
+
 import json
 from http.server import HTTPServer
 from nss_handler import HandleRequests, status
-
-
-# Add your imports below this line
 from views import OrdersView, SizesView, StylesView, MetalsView
 
 
@@ -41,14 +40,14 @@ class JSONServer(HandleRequests):
         except AttributeError:
             return self.response("No view for that route", status.HTTP_404_CLIENT_ERROR_RESOURCE_NOT_FOUND.value)
 
-    # def do_DELETE(self):
-    #     url = self.parse_url(self.path)
-    #     view = self.determine_view(url)
+    def do_DELETE(self):
+        url = self.parse_url(self.path)
+        view = self.determine_view(url)
 
-    #     try:
-    #         view.delete(self, url["pk"])
-    #     except AttributeError:
-    #         return self.response("No view for that route", status.HTTP_404_CLIENT_ERROR_RESOURCE_NOT_FOUND.value)
+        try:
+            view.delete(self, url["pk"])
+        except AttributeError:
+            return self.response("Unsupported method", status.HTTP_405_UNSUPPORTED_METHOD.value)
 
     def determine_view(self, url):
         """Lookup the correct view class to handle the requested route
