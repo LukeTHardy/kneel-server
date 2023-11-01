@@ -2,7 +2,6 @@ import json
 import time
 from nss_handler import status
 from repository import db_get_single, db_get_all, db_create, db_delete
-# db_update, 
 
 class OrdersView():
         
