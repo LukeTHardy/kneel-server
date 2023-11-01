@@ -17,14 +17,10 @@ class JSONServer(HandleRequests):
         except AttributeError:
             return self.response("No view for that route", status.HTTP_404_CLIENT_ERROR_RESOURCE_NOT_FOUND.value)
 
-    # def do_PUT(self):
-    #     url = self.parse_url(self.path)
-    #     view = self.determine_view(url)
-
-    #     try:
-    #         view.update(self, self.get_request_body(), url["pk"])
-    #     except AttributeError:
-    #         return self.response("No view for that route", status.HTTP_404_CLIENT_ERROR_RESOURCE_NOT_FOUND.value)
+    def do_PUT(self):
+        url = self.parse_url(self.path)
+        view = self.determine_view(url)
+        return self.response("Unsupported method", status.HTTP_405_UNSUPPORTED_METHOD.value)
 
     def do_POST(self):
         # Parse the URL
@@ -33,12 +29,14 @@ class JSONServer(HandleRequests):
         view = self.determine_view(url)
         # Get the request body
         request_body = self.get_request_body()
-        # Invoke the correct method on the view
+        # if request_body.len() < 3:
+        #     return self.response("Bad request data", status.HTTP_400_CLIENT_ERROR_BAD_REQUEST_DATA.value)
         try:
             view.create(self, request_body)
         # Make sure you handle the AttributeError in case the client requested a route that you don't support
         except AttributeError:
-            return self.response("No view for that route", status.HTTP_404_CLIENT_ERROR_RESOURCE_NOT_FOUND.value)
+            return self.response("Unsupported method on this resource", status.HTTP_405_UNSUPPORTED_METHOD.value)
+
 
     def do_DELETE(self):
         url = self.parse_url(self.path)
